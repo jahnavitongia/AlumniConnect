@@ -1,0 +1,38 @@
+$CURSOR$
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Node modules
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build output
+dist/
+build/
+.next/
+.nuxt/
+
+# Testing
+coverage/
+*.lcov
+
+# System
+.DS_Store
+Thumbs.db
+
+# IDEs
+.idea/
+.vscode/
+
+# Misc
+.cache/
+.parcel-cache/
+*.sqlite
+
