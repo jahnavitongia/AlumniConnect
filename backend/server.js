@@ -22,11 +22,16 @@ app.get("/", (req, res) => {
     res.send("AlumniConnect Backend Running");
 });
 
+const authRoutes = require("./routes/authRoutes");
+
+app.use("/api/auth", authRoutes);
+
+const profileRoutes = require("./routes/profile");
+
+app.use("/api/profile", profileRoutes);
+
 
 app.listen(5000, () => {
     console.log("Server running on port 5000");
 });
 
-const authRoutes = require("./routes/authRoutes");
-
-app.use("/api/auth", authRoutes);
