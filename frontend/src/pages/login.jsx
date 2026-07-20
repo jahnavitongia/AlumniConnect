@@ -1,84 +1,103 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import API from "../api/axios";
 
 
 function Login() {
 
+
     const navigate = useNavigate();
 
 
-    const [formData, setFormData] = useState({
 
-        email: "",
-        password: ""
+    const [email,setEmail] = useState("");
 
-    });
+    const [password,setPassword] = useState("");
 
-
-
-    const handleChange = (e) => {
-
-        setFormData({
-
-            ...formData,
-            [e.target.name]: e.target.value
-
-        });
-
-    };
+    const [error,setError] = useState("");
 
 
 
-    const handleSubmit = async (e) => {
-        console.log("LOGIN BUTTON CLICKED");
+
+
+
+    const handleLogin = async(e)=>{
+
 
         e.preventDefault();
 
 
-        try {
 
-            const response = await API.post(
-                "/auth/login",
-                formData
-            );
-
-            console.log("API RESPONSE RECEIVED");
-console.log(response.data);
+        try{
 
 
             console.log(
+                "LOGIN BUTTON CLICKED"
+            );
+
+
+
+            const response = await API.post(
+
+                "/auth/login",
+
+                {
+
+                    email,
+
+                    password
+
+                }
+
+            );
+
+
+
+            console.log(
+
                 "LOGIN RESPONSE:",
+
                 response.data
+
             );
 
 
-            alert(response.data.message);
-
-
-
-            // Save token
-
-            localStorage.setItem(
-                "token",
-                response.data.token
-            );
 
 
 
             // Save user details
 
             localStorage.setItem(
+
                 "user",
+
                 JSON.stringify(response.data.user)
+
             );
+
+
 
 
 
             console.log(
+
                 "SAVED USER:",
+
                 response.data.user
+
             );
+
+
+
+
+
+            alert(
+
+                "Login successful"
+
+            );
+
+
 
 
 
@@ -86,18 +105,29 @@ console.log(response.data);
 
 
 
-        } catch (error) {
+
+
+        }
+        catch(error){
+
 
 
             console.log(
+
                 "LOGIN ERROR:",
+
                 error
+
             );
 
 
-            alert(
+
+            setError(
+
                 error.response?.data?.message ||
+
                 "Login failed"
+
             );
 
 
@@ -108,73 +138,255 @@ console.log(response.data);
 
 
 
+
+
+
+
+
     return (
 
-        <div>
+
+        <div
 
 
-            <h1>
-                AlumniConnect Login
-            </h1>
+        style={{
+
+            display:"flex",
+
+            justifyContent:"center",
+
+            alignItems:"center",
+
+            height:"100vh",
+
+            background:"#f3f4f6"
+
+        }}
 
 
-
-            <form onSubmit={handleSubmit}>
-
-
-                <input
-
-                    type="email"
-
-                    name="email"
-
-                    placeholder="Email"
-
-                    value={formData.email}
-
-                    onChange={handleChange}
-
-                />
-
-
-                <br /><br />
+        >
 
 
 
-                <input
-
-                    type="password"
-
-                    name="password"
-
-                    placeholder="Password"
-
-                    value={formData.password}
-
-                    onChange={handleChange}
-
-                />
+        <form
 
 
-                <br /><br />
+        onSubmit={handleLogin}
+
+
+        style={{
+
+
+            width:"350px",
+
+            padding:"35px",
+
+            borderRadius:"20px",
+
+            background:"white",
+
+            boxShadow:"0 5px 20px rgba(0,0,0,0.15)"
+
+
+        }}
+
+
+        >
 
 
 
-                <button type="submit">
 
-                    Login
+        <h1
 
-                </button>
+        style={{
+
+            textAlign:"center"
+
+        }}
+
+        >
+
+        Login
+
+        </h1>
 
 
 
-            </form>
+
+
+        {
+
+        error &&
+
+        <p
+
+        style={{
+
+            color:"red"
+
+        }}
+
+        >
+
+        {error}
+
+        </p>
+
+        }
+
+
+
+
+
+        <input
+
+
+        type="email"
+
+
+        placeholder="Email"
+
+
+        value={email}
+
+
+        onChange={(e)=>
+
+            setEmail(e.target.value)
+
+        }
+
+
+        style={{
+
+            width:"100%",
+
+            padding:"12px",
+
+            marginBottom:"15px"
+
+        }}
+
+
+        />
+
+
+
+
+
+
+        <input
+
+
+        type="password"
+
+
+        placeholder="Password"
+
+
+        value={password}
+
+
+        onChange={(e)=>
+
+            setPassword(e.target.value)
+
+        }
+
+
+        style={{
+
+            width:"100%",
+
+            padding:"12px",
+
+            marginBottom:"20px"
+
+        }}
+
+
+        />
+
+
+
+
+
+
+        <button
+
+
+        type="submit"
+
+
+        style={{
+
+            width:"100%",
+
+            padding:"12px",
+
+            border:"none",
+
+            borderRadius:"20px",
+
+            background:"#2563eb",
+
+            color:"white",
+
+            cursor:"pointer"
+
+        }}
+
+
+        >
+
+        Login
+
+        </button>
+
+
+
+
+
+
+        <p
+
+        style={{
+
+            textAlign:"center",
+
+            marginTop:"20px"
+
+        }}
+
+        >
+
+        Don't have an account?
+
+
+        <Link to="/register">
+
+        Register
+
+        </Link>
+
+
+        </p>
+
+
+
+
+
+
+        </form>
+
 
 
 
         </div>
 
+
     );
+
 
 }
 

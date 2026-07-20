@@ -4,9 +4,13 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
+import Alumni from "./pages/Alumni";
+import AlumniProfile from "./pages/AlumniProfile";
+import Chat from "./pages/Chat";
 
 
 function App() {
+
 
   return (
 
@@ -14,19 +18,63 @@ function App() {
 
       <Routes>
 
-        <Route path="/" element={<Login />} />
 
-        <Route path="/register" element={<Register />} />
+        <Route 
+          path="/" 
+          element={<Login />} 
+        />
 
-        <Route path="/dashboard" element={<Dashboard />} />
 
-        <Route path="/profile" element={<Profile />} />
+        <Route 
+          path="/login" 
+          element={<Login />} 
+        />
+
+
+        <Route 
+          path="/register" 
+          element={<Register />} 
+        />
+
+
+        <Route 
+          path="/dashboard" 
+          element={<Dashboard />} 
+        />
+
+
+        <Route 
+          path="/profile" 
+          element={<Profile />} 
+        />
+
+
+        <Route 
+          path="/alumni" 
+          element={<Alumni />} 
+        />
+
+
+        <Route 
+          path="/alumni/:id" 
+          element={<AlumniProfile />} 
+        />
+
+
+        <Route 
+          path="/chat/:id" 
+          element={<Chat />} 
+        />
+
 
       </Routes>
+
 
     </BrowserRouter>
 
   );
+
 }
+
 
 export default App;

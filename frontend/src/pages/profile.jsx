@@ -1,113 +1,446 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import API from "../api/axios";
+import Navbar from "../components/Navbar";
 
 
 function Profile() {
 
-    const [profile, setProfile] = useState({
 
-        name: "",
-        batch: "",
-        branch: "",
-        company: "",
-        position: "",
-        skills: "",
-        bio: ""
-
-    });
-
-
-    useEffect(() => {
-
-        fetchProfile();
-
-    }, []);
+    const user = JSON.parse(
+        localStorage.getItem("user")
+    );
 
 
 
-    const fetchProfile = async () => {
+    const emptyProfile = {
 
-        try {
+        name:"",
+        batch:"",
+        branch:"",
+        company:"",
+        position:"",
+        skills:"",
+        bio:"",
+        profileImage:""
 
-            const user = JSON.parse(
-                localStorage.getItem("user")
+    };
+
+
+
+    const [profile,setProfile] = useState(emptyProfile);
+
+
+    const [image,setImage] = useState(null);
+
+
+    const [exists,setExists] = useState(false);
+
+
+    const [loading,setLoading] = useState(true);
+
+
+
+
+
+    useEffect(()=>{
+
+
+        if(user && user._id){
+
+            getProfile();
+
+        }
+        else{
+
+            setLoading(false);
+
+        }
+
+
+    },[]);
+
+
+
+
+
+
+
+    const getProfile = async()=>{
+
+
+        try{
+
+
+            const res = await API.get(
+
+                `/profile/${user._id}`
+
             );
 
 
-            if (!user) {
+            console.log(
+                "PROFILE RESPONSE:",
+                res.data
+            );
 
-                alert("Please login first");
-                return;
+
+
+            if(res.data && res.data._id){
+
+                setProfile(res.data);
+
+                setExists(true);
 
             }
 
 
-            const response = await API.get(
-                `/profile/${user._id}`
+
+        }
+        catch(error){
+
+
+            console.log(
+
+                "No profile exists"
+
             );
 
 
-            setProfile(response.data);
+            setExists(false);
 
 
-        } catch (error) {
+        }
+        finally{
 
-            console.log("Profile not found yet");
+
+            setLoading(false);
+
 
         }
 
-    };
-
-
-
-    const handleChange = (e) => {
-
-        setProfile({
-
-            ...profile,
-            [e.target.name]: e.target.value
-
-        });
 
     };
 
 
 
-    const saveProfile = async () => {
-
-        try {
-
-            const user = JSON.parse(
-                localStorage.getItem("user")
-            );
 
 
-            const profileData = {
-
-                ...profile,
-                userId: user._id
-
-            };
 
 
-            const response = await API.post(
+
+    const handleChange=(e)=>{
+
+
+        setProfile(prev=>({
+
+            ...prev,
+
+            [e.target.name]:
+            e.target.value
+
+        }));
+
+
+    };
+
+
+
+
+
+
+
+
+    const createProfile=async()=>{
+
+
+        try{
+
+
+            const res = await API.post(
+
                 "/profile/create",
-                profileData
+
+                {
+
+                    userId:user._id,
+
+                    ...profile
+
+                }
+
             );
 
 
-            alert(response.data.message);
+
+            console.log(res.data);
 
 
-        } catch (error) {
+
+            setProfile(
+
+                res.data.profile
+
+            );
+
+
+            setExists(true);
+
+
+
+            alert(
+
+                "Profile created successfully"
+
+            );
+
+
+
+        }
+        catch(error){
+
 
             console.log(error);
 
-            alert("Profile save failed");
+
+            alert(
+
+                "Profile creation failed"
+
+            );
+
 
         }
 
+
     };
+
+
+
+
+
+
+
+
+
+    const updateProfile=async()=>{
+
+
+        try{
+
+
+            const res = await API.put(
+
+                `/profile/update/${user._id}`,
+
+                profile
+
+            );
+
+
+
+            console.log(res.data);
+
+
+
+            if(res.data.profile){
+
+                setProfile(
+                    res.data.profile
+                );
+
+            }
+
+
+
+            alert(
+
+                "Profile updated"
+
+            );
+
+
+        }
+        catch(error){
+
+
+            console.log(error);
+
+
+            alert(
+
+                "Update failed"
+
+            );
+
+
+        }
+
+
+    };
+
+
+
+
+
+
+
+
+
+    const uploadImage=async()=>{
+
+
+        if(!image){
+
+            alert(
+                "Select image first"
+            );
+
+            return;
+
+        }
+
+
+
+        try{
+
+
+            const formData = new FormData();
+
+
+
+            formData.append(
+
+                "profileImage",
+
+                image
+
+            );
+
+
+
+
+            const res = await API.post(
+
+                `/profile/upload/${user._id}`,
+
+                formData,
+
+                {
+
+                    headers:{
+
+                        "Content-Type":
+                        "multipart/form-data"
+
+                    }
+
+                }
+
+            );
+
+
+
+            console.log(
+
+                "UPLOAD RESPONSE",
+
+                res.data
+
+            );
+
+
+
+            if(res.data.profile){
+
+
+                setProfile(
+
+                    res.data.profile
+
+                );
+
+
+            }
+
+
+
+            alert(
+
+                "Photo uploaded successfully"
+
+            );
+
+
+
+        }
+        catch(error){
+
+
+            console.log(error);
+
+
+            alert(
+
+                "Upload failed"
+
+            );
+
+
+        }
+
+
+    };
+
+
+
+
+
+
+
+    if(loading){
+
+
+        return (
+
+            <>
+
+            <Navbar/>
+
+            <h2>
+                Loading...
+            </h2>
+
+            </>
+
+        );
+
+    }
+
+
+
+
+
+    if(!user){
+
+
+        return (
+
+            <>
+
+            <Navbar/>
+
+            <h2>
+                Please login first
+            </h2>
+
+            </>
+
+        );
+
+    }
+
+
+
 
 
 
@@ -115,83 +448,244 @@ function Profile() {
 
         <div>
 
-            <h1>My Profile</h1>
+
+            <Navbar/>
+
+
+            <h1>
+                My Profile
+            </h1>
+
+
+
+
+
+            {
+                profile?.profileImage &&
+
+                <img
+
+                src={profile.profileImage}
+
+                alt="profile"
+
+                width="150"
+
+                height="150"
+
+                style={{
+
+                    borderRadius:"50%",
+                    objectFit:"cover"
+
+                }}
+
+                />
+
+            }
+
+
+
+
+
+            <br/><br/>
+
+
 
 
             <input
-                name="name"
-                placeholder="Name"
-                value={profile.name}
-                onChange={handleChange}
+
+            type="file"
+
+            accept="image/*"
+
+            onChange={(e)=>
+
+                setImage(
+                    e.target.files[0]
+                )
+
+            }
+
             />
 
-            <br /><br />
+
+
+            <br/><br/>
+
+
+
+
+            <button onClick={uploadImage}>
+
+                Upload Photo
+
+            </button>
+
+
+
+
+            <br/><br/>
+
+
+
+
 
 
             <input
-                name="batch"
-                placeholder="Graduation Year"
-                value={profile.batch}
-                onChange={handleChange}
+
+            name="name"
+
+            placeholder="Name"
+
+            value={profile?.name || ""}
+
+            onChange={handleChange}
+
             />
 
-            <br /><br />
+
+
+            <br/><br/>
+
+
 
 
             <input
-                name="branch"
-                placeholder="Branch"
-                value={profile.branch}
-                onChange={handleChange}
+
+            name="batch"
+
+            placeholder="Batch"
+
+            value={profile?.batch || ""}
+
+            onChange={handleChange}
+
             />
 
-            <br /><br />
+
+
+            <br/><br/>
+
+
 
 
             <input
-                name="company"
-                placeholder="Current Company"
-                value={profile.company}
-                onChange={handleChange}
+
+            name="branch"
+
+            placeholder="Branch"
+
+            value={profile?.branch || ""}
+
+            onChange={handleChange}
+
             />
 
-            <br /><br />
+
+
+            <br/><br/>
+
+
 
 
             <input
-                name="position"
-                placeholder="Job Role"
-                value={profile.position}
-                onChange={handleChange}
+
+            name="company"
+
+            placeholder="Company"
+
+            value={profile?.company || ""}
+
+            onChange={handleChange}
+
             />
 
-            <br /><br />
+
+
+            <br/><br/>
+
+
 
 
             <input
-                name="skills"
-                placeholder="Skills"
-                value={profile.skills}
-                onChange={handleChange}
+
+            name="position"
+
+            placeholder="Position"
+
+            value={profile?.position || ""}
+
+            onChange={handleChange}
+
             />
 
-            <br /><br />
+
+
+            <br/><br/>
+
+
+
+
+            <input
+
+            name="skills"
+
+            placeholder="Skills"
+
+            value={profile?.skills || ""}
+
+            onChange={handleChange}
+
+            />
+
+
+
+            <br/><br/>
+
+
 
 
             <textarea
-                name="bio"
-                placeholder="Bio"
-                value={profile.bio}
-                onChange={handleChange}
+
+            name="bio"
+
+            placeholder="Bio"
+
+            value={profile?.bio || ""}
+
+            onChange={handleChange}
+
             />
 
 
-            <br /><br />
+
+            <br/><br/>
 
 
-            <button onClick={saveProfile}>
-                Save Profile
+
+
+
+            {
+
+            exists ?
+
+            <button onClick={updateProfile}>
+
+                Update Profile
+
             </button>
+
+            :
+
+            <button onClick={createProfile}>
+
+                Create Profile
+
+            </button>
+
+            }
+
 
 
         </div>
@@ -199,6 +693,7 @@ function Profile() {
     );
 
 }
+
 
 
 export default Profile;
