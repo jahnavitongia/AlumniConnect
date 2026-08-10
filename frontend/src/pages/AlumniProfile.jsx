@@ -3,336 +3,101 @@ import { useParams, Link } from "react-router-dom";
 import API from "../api/axios";
 import Navbar from "../components/Navbar";
 
-
 function AlumniProfile() {
-
-
     const { id } = useParams();
-
-
     const [profile, setProfile] = useState(null);
-
     const [error, setError] = useState("");
 
-
-
-
     useEffect(() => {
-
         fetchProfile();
-
     }, []);
 
-
-
-
-
     const fetchProfile = async () => {
-
-
         try {
-
-
-            const response = await API.get(
-
-                `/profile/view/${id}`
-
-            );
-
-
-            console.log(
-
-                "PROFILE DATA:",
-
-                response.data
-
-            );
-
-
+            const response = await API.get(`/profile/view/${id}`);
             setProfile(response.data);
-
-
-
         } catch (err) {
-
-
-            console.log(err);
-
-
-            setError(
-                "Profile not found"
-            );
-
-
+            setError("Profile not found");
         }
-
-
     };
 
-
-
-
-
-
-    if(error){
-
-
+    if (error) {
         return (
-
-            <div>
-
+            <div className="page-shell">
                 <Navbar />
-
-                <h2>
-
-                    {error}
-
-                </h2>
-
+                <div className="page-content">
+                    <div className="empty-state glass-card">{error}</div>
+                </div>
             </div>
-
         );
-
     }
 
-
-
-
-
-
-
-    if(!profile){
-
-
+    if (!profile) {
         return (
-
-            <div>
-
+            <div className="page-shell">
                 <Navbar />
-
-                <h2>
-
-                    Loading profile...
-
-                </h2>
-
+                <div className="page-content">
+                    <div className="loading-state glass-card">Loading profile…</div>
+                </div>
             </div>
-
         );
-
-
     }
-
-
-
-
-
 
     return (
-
-        <div>
-
-
+        <div className="page-shell">
             <Navbar />
 
+            <div className="page-content">
+                <div className="profile-hero glass-card">
+                    <div className="profile-hero-main">
+                        {profile.profileImage ? (
+                            <img src={profile.profileImage} alt="Profile" className="avatar avatar-large" style={{ objectFit: "cover" }} />
+                        ) : (
+                            <div className="avatar avatar-large">{profile.name ? profile.name.charAt(0).toUpperCase() : "U"}</div>
+                        )}
+                        <div>
+                            <h2>{profile.name}</h2>
+                            <p>{profile.company || "Career details coming soon"}</p>
+                        </div>
+                    </div>
+                    <Link className="btn btn-primary" to={`/chat/${profile.userId}`}>
+                        💬 Message
+                    </Link>
+                </div>
 
+                <div className="detail-grid">
+                    <div className="detail-card glass-card">
+                        <h3>Batch</h3>
+                        <p>{profile.batch || "Not shared"}</p>
+                    </div>
+                    <div className="detail-card glass-card">
+                        <h3>Branch</h3>
+                        <p>{profile.branch || "Not shared"}</p>
+                    </div>
+                    <div className="detail-card glass-card">
+                        <h3>Company</h3>
+                        <p>{profile.company || "Not shared"}</p>
+                    </div>
+                    <div className="detail-card glass-card">
+                        <h3>Position</h3>
+                        <p>{profile.position || "Not shared"}</p>
+                    </div>
+                </div>
 
-            <div
+                <div className="section-card glass-card" style={{ marginTop: "18px" }}>
+                    <h3>Skills</h3>
+                    <div className="chip-row">
+                        {profile.skills ? profile.skills.split(",").map((skill) => <span key={skill} className="chip">{skill.trim()}</span>) : <p>No skills listed yet.</p>}
+                    </div>
+                </div>
 
-            style={{
-
-                padding:"40px",
-
-                textAlign:"center"
-
-            }}
-
-            >
-
-
-
-
-
-            {
-
-            profile.profileImage ?
-
-
-            <img
-
-            src={profile.profileImage}
-
-            alt="Profile"
-
-            width="180"
-
-            height="180"
-
-            style={{
-
-                borderRadius:"50%",
-
-                objectFit:"cover"
-
-            }}
-
-            />
-
-            :
-
-
-            <div
-
-            style={{
-
-                width:"180px",
-
-                height:"180px",
-
-                borderRadius:"50%",
-
-                background:"#ddd",
-
-                margin:"auto",
-
-                display:"flex",
-
-                justifyContent:"center",
-
-                alignItems:"center",
-
-                fontSize:"60px"
-
-            }}
-
-            >
-
-                👤
-
+                <div className="section-card glass-card" style={{ marginTop: "18px" }}>
+                    <h3>About</h3>
+                    <p>{profile.bio || "No bio added yet."}</p>
+                </div>
             </div>
-
-
-            }
-
-
-
-
-
-            <h1>
-
-                {profile.name}
-
-            </h1>
-
-
-
-
-            <p>
-
-                🎓 Batch: {profile.batch}
-
-            </p>
-
-
-
-
-            <p>
-
-                💻 Branch: {profile.branch}
-
-            </p>
-
-
-
-
-            <p>
-
-                🏢 Company: {profile.company}
-
-            </p>
-
-
-
-
-            <p>
-
-                💼 Position: {profile.position}
-
-            </p>
-
-
-
-
-            <p>
-
-                🛠 Skills: {profile.skills}
-
-            </p>
-
-
-
-
-            <p>
-
-                📝 About: {profile.bio}
-
-            </p>
-
-
-
-
-
-
-            <Link
-
-            to={`/chat/${profile.userId}`}
-
-            >
-
-                <button
-
-                style={{
-
-                    marginTop:"20px",
-
-                    padding:"12px 30px",
-
-                    borderRadius:"25px",
-
-                    border:"none",
-
-                    background:"#2563eb",
-
-                    color:"white",
-
-                    cursor:"pointer"
-
-                }}
-
-                >
-
-                    💬 Message
-
-                </button>
-
-
-            </Link>
-
-
-
-
-
-            </div>
-
-
-
         </div>
-
     );
-
-
 }
-
-
 
 export default AlumniProfile;

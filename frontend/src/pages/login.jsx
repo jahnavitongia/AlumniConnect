@@ -2,393 +2,74 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import API from "../api/axios";
 
-
 function Login() {
-
-
     const navigate = useNavigate();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
 
-
-
-    const [email,setEmail] = useState("");
-
-    const [password,setPassword] = useState("");
-
-    const [error,setError] = useState("");
-
-
-
-
-
-
-    const handleLogin = async(e)=>{
-
-
+    const handleLogin = async (e) => {
         e.preventDefault();
 
+        try {
+            const response = await API.post("/auth/login", {
+                email,
+                password,
+            });
 
-
-        try{
-
-
-            console.log(
-                "LOGIN BUTTON CLICKED"
-            );
-
-
-
-            const response = await API.post(
-
-                "/auth/login",
-
-                {
-
-                    email,
-
-                    password
-
-                }
-
-            );
-
-
-
-            console.log(
-
-                "LOGIN RESPONSE:",
-
-                response.data
-
-            );
-
-
-
-
-
-            // Save user details
-
-            localStorage.setItem(
-
-                "user",
-
-                JSON.stringify(response.data.user)
-
-            );
-
-
-
-
-
-            console.log(
-
-                "SAVED USER:",
-
-                response.data.user
-
-            );
-
-
-
-
-
-            alert(
-
-                "Login successful"
-
-            );
-
-
-
-
-
+            localStorage.setItem("user", JSON.stringify(response.data.user));
+            alert("Login successful");
             navigate("/dashboard");
-
-
-
-
-
+        } catch (error) {
+            setError(error.response?.data?.message || "Login failed");
         }
-        catch(error){
-
-
-
-            console.log(
-
-                "LOGIN ERROR:",
-
-                error
-
-            );
-
-
-
-            setError(
-
-                error.response?.data?.message ||
-
-                "Login failed"
-
-            );
-
-
-        }
-
-
     };
 
-
-
-
-
-
-
-
     return (
-
-
-        <div
-
-
-        style={{
-
-            display:"flex",
-
-            justifyContent:"center",
-
-            alignItems:"center",
-
-            height:"100vh",
-
-            background:"#f3f4f6"
-
-        }}
-
-
-        >
-
-
-
-        <form
-
-
-        onSubmit={handleLogin}
-
-
-        style={{
-
-
-            width:"350px",
-
-            padding:"35px",
-
-            borderRadius:"20px",
-
-            background:"white",
-
-            boxShadow:"0 5px 20px rgba(0,0,0,0.15)"
-
-
-        }}
-
-
-        >
-
-
-
-
-        <h1
-
-        style={{
-
-            textAlign:"center"
-
-        }}
-
-        >
-
-        Login
-
-        </h1>
-
-
-
-
-
-        {
-
-        error &&
-
-        <p
-
-        style={{
-
-            color:"red"
-
-        }}
-
-        >
-
-        {error}
-
-        </p>
-
-        }
-
-
-
-
-
-        <input
-
-
-        type="email"
-
-
-        placeholder="Email"
-
-
-        value={email}
-
-
-        onChange={(e)=>
-
-            setEmail(e.target.value)
-
-        }
-
-
-        style={{
-
-            width:"100%",
-
-            padding:"12px",
-
-            marginBottom:"15px"
-
-        }}
-
-
-        />
-
-
-
-
-
-
-        <input
-
-
-        type="password"
-
-
-        placeholder="Password"
-
-
-        value={password}
-
-
-        onChange={(e)=>
-
-            setPassword(e.target.value)
-
-        }
-
-
-        style={{
-
-            width:"100%",
-
-            padding:"12px",
-
-            marginBottom:"20px"
-
-        }}
-
-
-        />
-
-
-
-
-
-
-        <button
-
-
-        type="submit"
-
-
-        style={{
-
-            width:"100%",
-
-            padding:"12px",
-
-            border:"none",
-
-            borderRadius:"20px",
-
-            background:"#2563eb",
-
-            color:"white",
-
-            cursor:"pointer"
-
-        }}
-
-
-        >
-
-        Login
-
-        </button>
-
-
-
-
-
-
-        <p
-
-        style={{
-
-            textAlign:"center",
-
-            marginTop:"20px"
-
-        }}
-
-        >
-
-        Don't have an account?
-
-
-        <Link to="/register">
-
-        Register
-
-        </Link>
-
-
-        </p>
-
-
-
-
-
-
-        </form>
-
-
-
-
+        <div className="auth-shell">
+            <div className="auth-card">
+                <div className="auth-intro">
+                    <p className="eyebrow">AlumniConnect</p>
+                    <h1>Welcome back to your professional circle.</h1>
+                    <p>Sign in to reconnect with alumni, discover opportunities, and keep your network moving.</p>
+                    <div className="feature-stack">
+                        <span className="feature-pill">Trusted alumni network</span>
+                        <span className="feature-pill">Private messaging</span>
+                        <span className="feature-pill">Profile discovery</span>
+                    </div>
+                </div>
+
+                <div className="auth-panel">
+                    <div className="panel-header">
+                        <h2>Log in</h2>
+                        <p>Access your account to continue.</p>
+                    </div>
+
+                    <form className="auth-form" onSubmit={handleLogin}>
+                        {error && <p style={{ color: "#ff8d9d" }}>{error}</p>}
+
+                        <div className="input-group">
+                            <span>Email</span>
+                            <input type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+                        </div>
+
+                        <div className="input-group">
+                            <span>Password</span>
+                            <input type="password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                        </div>
+
+                        <button className="btn btn-primary" type="submit">
+                            Login
+                        </button>
+
+                        <p className="switch-text">
+                            New here? <Link to="/register">Create an account</Link>
+                        </p>
+                    </form>
+                </div>
+            </div>
         </div>
-
-
     );
-
-
 }
-
 
 export default Login;

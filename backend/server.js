@@ -3,86 +3,82 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
 
-
 const app = express();
 
 
-app.use(cors());
+// ===============================
+// CORS
+// ===============================
+
+app.use(
+    cors({
+        origin: [
+            "http://localhost:5173",
+            "http://127.0.0.1:5173"
+        ],
+        methods: [
+            "GET",
+            "POST",
+            "PUT",
+            "DELETE",
+            "OPTIONS"
+        ],
+        allowedHeaders: [
+            "Content-Type",
+            "Authorization"
+        ]
+    })
+);
+
+
+// ===============================
+// BODY PARSER
+// ===============================
 
 app.use(express.json());
 
 
-
-
+// ===============================
 // ROUTES
+// ===============================
 
 const authRoutes = require("./routes/authRoutes");
-
 const profileRoutes = require("./routes/profile");
-
 const messageRoutes = require("./routes/message");
 
+app.use("/api/auth", authRoutes);
+app.use("/api/profile", profileRoutes);
+app.use("/api/message", messageRoutes);
 
 
+// ===============================
+// HEALTH CHECK
+// ===============================
 
-
-app.use(
-"/api/auth",
-authRoutes
-);
-
-
-app.use(
-"/api/profile",
-profileRoutes
-);
-
-
-app.use(
-"/api/message",
-messageRoutes
-);
-
-
-
-
-
-
-app.get("/",(req,res)=>{
-
-    res.send("API Running");
-
+app.get("/", (req, res) => {
+    res.status(200).send("API Running");
 });
 
 
+// ===============================
+// MONGODB
+// ===============================
+
+mongoose
+    .connect(process.env.MONGO_URI)
+    .then(() => {
+        console.log("MongoDB Connected");
+    })
+    .catch((error) => {
+        console.log("MongoDB Connection Error:");
+        console.log(error);
+    });
 
 
+// ===============================
+// SERVER
+// ===============================
 
-
-mongoose.connect(process.env.MONGO_URI)
-
-.then(()=>{
-
-    console.log("MongoDB Connected");
-
-})
-
-.catch((error)=>{
-
-    console.log(error);
-
-});
-
-
-
-
-
-
-
-app.listen(5000,()=>{
-
-    console.log(
-        "Server running on port 5000"
-    );
-
+app.listen(5001, () => {
+    console.log("Server running on port 5001");
 });

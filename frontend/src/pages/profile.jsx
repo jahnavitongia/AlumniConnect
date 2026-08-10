@@ -2,698 +2,468 @@ import { useEffect, useState } from "react";
 import API from "../api/axios";
 import Navbar from "../components/Navbar";
 
-
 function Profile() {
+    const [profile, setProfile] = useState({
+        name: "",
+        batch: "",
+        branch: "",
+        company: "",
+        position: "",
+        skills: "",
+        bio: "",
+        profileImage: "",
+    });
 
+    const [image, setImage] = useState(null);
+    const [exists, setExists] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     const user = JSON.parse(
-        localStorage.getItem("user")
+        localStorage.getItem("user") || "null"
     );
 
-
-
-    const emptyProfile = {
-
-        name:"",
-        batch:"",
-        branch:"",
-        company:"",
-        position:"",
-        skills:"",
-        bio:"",
-        profileImage:""
-
-    };
-
-
-
-    const [profile,setProfile] = useState(emptyProfile);
-
-
-    const [image,setImage] = useState(null);
-
-
-    const [exists,setExists] = useState(false);
-
-
-    const [loading,setLoading] = useState(true);
-
-
-
-
-
-    useEffect(()=>{
-
-
-        if(user && user._id){
-
+    useEffect(() => {
+        if (user && user._id) {
             getProfile();
-
-        }
-        else{
-
+        } else {
             setLoading(false);
-
         }
+    }, []);
 
-
-    },[]);
-
-
-
-
-
-
-
-    const getProfile = async()=>{
-
-
-        try{
-
-
-            const res = await API.get(
-
-                `/profile/${user._id}`
-
+    async function getProfile() {
+        try {
+            const response = await API.get(
+                "/profile/" + user._id
             );
 
+            console.log("PROFILE:", response.data);
 
-            console.log(
-                "PROFILE RESPONSE:",
-                res.data
-            );
-
-
-
-            if(res.data && res.data._id){
-
-                setProfile(res.data);
-
+            if (response.data) {
+                setProfile(response.data);
                 setExists(true);
-
             }
-
-
-
-        }
-        catch(error){
-
-
+        } catch (error) {
             console.log(
-
-                "No profile exists"
-
+                "Profile not found:",
+                error.response?.data || error.message
             );
-
 
             setExists(false);
-
-
-        }
-        finally{
-
-
+        } finally {
             setLoading(false);
-
-
         }
+    }
 
+    function handleChange(event) {
+        const { name, value } = event.target;
 
-    };
-
-
-
-
-
-
-
-
-    const handleChange=(e)=>{
-
-
-        setProfile(prev=>({
-
-            ...prev,
-
-            [e.target.name]:
-            e.target.value
-
+        setProfile((previous) => ({
+            ...previous,
+            [name]: value,
         }));
+    }
 
-
-    };
-
-
-
-
-
-
-
-
-    const createProfile=async()=>{
-
-
-        try{
-
-
-            const res = await API.post(
-
+    async function createProfile() {
+        try {
+            const response = await API.post(
                 "/profile/create",
-
                 {
-
-                    userId:user._id,
-
-                    ...profile
-
+                    userId: user._id,
+                    name: profile.name,
+                    batch: profile.batch,
+                    branch: profile.branch,
+                    company: profile.company,
+                    position: profile.position,
+                    skills: profile.skills,
+                    bio: profile.bio,
                 }
-
             );
 
-
-
-            console.log(res.data);
-
-
-
-            setProfile(
-
-                res.data.profile
-
-            );
-
-
+            setProfile(response.data.profile);
             setExists(true);
 
-
-
-            alert(
-
-                "Profile created successfully"
-
-            );
-
-
-
-        }
-        catch(error){
-
-
-            console.log(error);
-
+            alert("Profile created successfully");
+        } catch (error) {
+            console.error(error);
 
             alert(
-
+                error.response?.data?.message ||
                 "Profile creation failed"
-
             );
-
-
         }
+    }
 
-
-    };
-
-
-
-
-
-
-
-
-
-    const updateProfile=async()=>{
-
-
-        try{
-
-
-            const res = await API.put(
-
-                `/profile/update/${user._id}`,
-
-                profile
-
+    async function updateProfile() {
+        try {
+            const response = await API.put(
+                "/profile/update/" + user._id,
+                {
+                    name: profile.name,
+                    batch: profile.batch,
+                    branch: profile.branch,
+                    company: profile.company,
+                    position: profile.position,
+                    skills: profile.skills,
+                    bio: profile.bio,
+                }
             );
 
-
-
-            console.log(res.data);
-
-
-
-            if(res.data.profile){
-
-                setProfile(
-                    res.data.profile
-                );
-
+            if (response.data.profile) {
+                setProfile(response.data.profile);
             }
 
-
-
-            alert(
-
-                "Profile updated"
-
-            );
-
-
-        }
-        catch(error){
-
-
-            console.log(error);
-
+            alert("Profile updated");
+        } catch (error) {
+            console.error(error);
 
             alert(
-
+                error.response?.data?.message ||
                 "Update failed"
-
             );
-
-
         }
+    }
 
-
-    };
-
-
-
-
-
-
-
-
-
-    const uploadImage=async()=>{
-
-
-        if(!image){
-
-            alert(
-                "Select image first"
-            );
-
+    async function uploadImage() {
+        if (!image) {
+            alert("Select image first");
             return;
-
         }
 
-
-
-        try{
-
-
+        try {
             const formData = new FormData();
 
-
-
             formData.append(
-
                 "profileImage",
-
                 image
-
             );
 
-
-
-
-            const res = await API.post(
-
-                `/profile/upload/${user._id}`,
-
+            const response = await API.post(
+                "/profile/upload/" + user._id,
                 formData,
-
                 {
-
-                    headers:{
-
+                    headers: {
                         "Content-Type":
-                        "multipart/form-data"
-
-                    }
-
+                            "multipart/form-data",
+                    },
                 }
-
             );
 
-
-
-            console.log(
-
-                "UPLOAD RESPONSE",
-
-                res.data
-
-            );
-
-
-
-            if(res.data.profile){
-
-
-                setProfile(
-
-                    res.data.profile
-
-                );
-
-
+            if (response.data.profile) {
+                setProfile(response.data.profile);
             }
 
-
+            setImage(null);
 
             alert(
-
                 "Photo uploaded successfully"
-
             );
-
-
-
-        }
-        catch(error){
-
-
-            console.log(error);
-
+        } catch (error) {
+            console.error(
+                "UPLOAD ERROR:",
+                error
+            );
 
             alert(
-
+                error.response?.data?.message ||
                 "Upload failed"
-
             );
-
-
         }
-
-
-    };
-
-
-
-
-
-
-
-    if(loading){
-
-
-        return (
-
-            <>
-
-            <Navbar/>
-
-            <h2>
-                Loading...
-            </h2>
-
-            </>
-
-        );
-
     }
 
-
-
-
-
-    if(!user){
-
-
+    if (loading) {
         return (
+            <div className="page-shell">
+                <Navbar />
 
-            <>
-
-            <Navbar/>
-
-            <h2>
-                Please login first
-            </h2>
-
-            </>
-
+                <div className="page-content">
+                    <div className="loading-state glass-card">
+                        Loading your profile…
+                    </div>
+                </div>
+            </div>
         );
-
     }
 
+    if (!user) {
+        return (
+            <div className="page-shell">
+                <Navbar />
 
-
-
-
+                <div className="page-content">
+                    <div className="empty-state glass-card">
+                        Please login first
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
-
-        <div>
-
-
-            <Navbar/>
-
-
-            <h1>
-                My Profile
-            </h1>
-
-
-
-
-
-            {
-                profile?.profileImage &&
-
-                <img
-
-                src={profile.profileImage}
-
-                alt="profile"
-
-                width="150"
-
-                height="150"
-
-                style={{
-
-                    borderRadius:"50%",
-                    objectFit:"cover"
-
-                }}
-
-                />
-
-            }
-
-
-
-
-
-            <br/><br/>
-
-
-
-
-            <input
-
-            type="file"
-
-            accept="image/*"
-
-            onChange={(e)=>
-
-                setImage(
-                    e.target.files[0]
-                )
-
-            }
-
-            />
-
-
-
-            <br/><br/>
-
-
-
-
-            <button onClick={uploadImage}>
-
-                Upload Photo
-
-            </button>
-
-
-
-
-            <br/><br/>
-
-
-
-
-
-
-            <input
-
-            name="name"
-
-            placeholder="Name"
-
-            value={profile?.name || ""}
-
-            onChange={handleChange}
-
-            />
-
-
-
-            <br/><br/>
-
-
-
-
-            <input
-
-            name="batch"
-
-            placeholder="Batch"
-
-            value={profile?.batch || ""}
-
-            onChange={handleChange}
-
-            />
-
-
-
-            <br/><br/>
-
-
-
-
-            <input
-
-            name="branch"
-
-            placeholder="Branch"
-
-            value={profile?.branch || ""}
-
-            onChange={handleChange}
-
-            />
-
-
-
-            <br/><br/>
-
-
-
-
-            <input
-
-            name="company"
-
-            placeholder="Company"
-
-            value={profile?.company || ""}
-
-            onChange={handleChange}
-
-            />
-
-
-
-            <br/><br/>
-
-
-
-
-            <input
-
-            name="position"
-
-            placeholder="Position"
-
-            value={profile?.position || ""}
-
-            onChange={handleChange}
-
-            />
-
-
-
-            <br/><br/>
-
-
-
-
-            <input
-
-            name="skills"
-
-            placeholder="Skills"
-
-            value={profile?.skills || ""}
-
-            onChange={handleChange}
-
-            />
-
-
-
-            <br/><br/>
-
-
-
-
-            <textarea
-
-            name="bio"
-
-            placeholder="Bio"
-
-            value={profile?.bio || ""}
-
-            onChange={handleChange}
-
-            />
-
-
-
-            <br/><br/>
-
-
-
-
-
-            {
-
-            exists ?
-
-            <button onClick={updateProfile}>
-
-                Update Profile
-
-            </button>
-
-            :
-
-            <button onClick={createProfile}>
-
-                Create Profile
-
-            </button>
-
-            }
-
-
-
+        <div className="page-shell">
+            <Navbar />
+
+            <div className="page-content">
+
+                <div className="page-header">
+                    <div>
+                        <p className="eyebrow">
+                            Your public presence
+                        </p>
+
+                        <h1>
+                            My Profile
+                        </h1>
+
+                        <p>
+                            Keep your story clear,
+                            polished, and easy to
+                            discover.
+                        </p>
+                    </div>
+
+                    <div className="profile-metric">
+                        {exists
+                            ? "Profile live"
+                            : "Draft ready"}
+                    </div>
+                </div>
+
+
+                <div className="profile-editor">
+
+                    <div className="section-card glass-card">
+
+                        <div className="profile-hero">
+
+                            <div className="profile-hero-main">
+
+                                {profile.profileImage ? (
+                                    <img
+                                        src={
+                                            profile.profileImage
+                                        }
+                                        alt="profile"
+                                        className="avatar avatar-large"
+                                        style={{
+                                            objectFit:
+                                                "cover",
+                                        }}
+                                    />
+                                ) : (
+                                    <div className="avatar avatar-large">
+                                        {profile.name
+                                            ? profile.name
+                                                .charAt(0)
+                                                .toUpperCase()
+                                            : "U"}
+                                    </div>
+                                )}
+
+                                <div>
+                                    <h2>
+                                        {profile.name ||
+                                            "Add your name"}
+                                    </h2>
+
+                                    <p>
+                                        {profile.company ||
+                                            "Share your current role"}
+                                    </p>
+                                </div>
+
+                            </div>
+
+                            <button
+                                className="btn btn-secondary"
+                                type="button"
+                                onClick={uploadImage}
+                            >
+                                Upload photo
+                            </button>
+
+                        </div>
+
+
+                        <div className="input-group">
+
+                            <span>
+                                Profile photo
+                            </span>
+
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(event) => {
+                                    setImage(
+                                        event.target.files?.[0] ||
+                                        null
+                                    );
+                                }}
+                            />
+
+                        </div>
+
+                    </div>
+
+
+                    <div className="section-card glass-card">
+
+                        <form className="profile-form">
+
+                            <div className="form-grid">
+
+                                <div className="input-group">
+                                    <span>Name</span>
+
+                                    <input
+                                        name="name"
+                                        placeholder="Name"
+                                        value={
+                                            profile.name
+                                        }
+                                        onChange={
+                                            handleChange
+                                        }
+                                    />
+                                </div>
+
+
+                                <div className="input-group">
+                                    <span>Batch</span>
+
+                                    <input
+                                        name="batch"
+                                        placeholder="Batch"
+                                        value={
+                                            profile.batch
+                                        }
+                                        onChange={
+                                            handleChange
+                                        }
+                                    />
+                                </div>
+
+
+                                <div className="input-group">
+                                    <span>Branch</span>
+
+                                    <input
+                                        name="branch"
+                                        placeholder="Branch"
+                                        value={
+                                            profile.branch
+                                        }
+                                        onChange={
+                                            handleChange
+                                        }
+                                    />
+                                </div>
+
+
+                                <div className="input-group">
+                                    <span>Company</span>
+
+                                    <input
+                                        name="company"
+                                        placeholder="Company"
+                                        value={
+                                            profile.company
+                                        }
+                                        onChange={
+                                            handleChange
+                                        }
+                                    />
+                                </div>
+
+
+                                <div className="input-group">
+                                    <span>Position</span>
+
+                                    <input
+                                        name="position"
+                                        placeholder="Position"
+                                        value={
+                                            profile.position
+                                        }
+                                        onChange={
+                                            handleChange
+                                        }
+                                    />
+                                </div>
+
+
+                                <div className="input-group">
+                                    <span>Skills</span>
+
+                                    <input
+                                        name="skills"
+                                        placeholder="Skills"
+                                        value={
+                                            profile.skills
+                                        }
+                                        onChange={
+                                            handleChange
+                                        }
+                                    />
+                                </div>
+
+                            </div>
+
+
+                            <div className="input-group">
+
+                                <span>Bio</span>
+
+                                <textarea
+                                    name="bio"
+                                    placeholder="Bio"
+                                    rows="5"
+                                    value={
+                                        profile.bio
+                                    }
+                                    onChange={
+                                        handleChange
+                                    }
+                                />
+
+                            </div>
+
+
+                            <div className="chip-row">
+
+                                {exists ? (
+                                    <button
+                                        className="btn btn-primary"
+                                        type="button"
+                                        onClick={
+                                            updateProfile
+                                        }
+                                    >
+                                        Update Profile
+                                    </button>
+                                ) : (
+                                    <button
+                                        className="btn btn-primary"
+                                        type="button"
+                                        onClick={
+                                            createProfile
+                                        }
+                                    >
+                                        Create Profile
+                                    </button>
+                                )}
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
         </div>
-
     );
-
 }
-
-
 
 export default Profile;

@@ -8,73 +8,54 @@ import Alumni from "./pages/Alumni";
 import AlumniProfile from "./pages/AlumniProfile";
 import Chat from "./pages/Chat";
 
-
 function App() {
+    return (
+        <BrowserRouter>
+            <Routes>
 
+                <Route
+                    path="/"
+                    element={<Login />}
+                />
 
-  return (
+                <Route
+                    path="/login"
+                    element={<Login />}
+                />
 
-    <BrowserRouter>
+                <Route
+                    path="/register"
+                    element={<Register />}
+                />
 
-      <Routes>
+                <Route
+                    path="/dashboard"
+                    element={<Dashboard />}
+                />
 
+                <Route
+                    path="/profile"
+                    element={<Profile />}
+                />
 
-        <Route 
-          path="/" 
-          element={<Login />} 
-        />
+                <Route
+                    path="/alumni"
+                    element={<Alumni />}
+                />
 
+                <Route
+                    path="/alumni/:id"
+                    element={<AlumniProfile />}
+                />
 
-        <Route 
-          path="/login" 
-          element={<Login />} 
-        />
+                <Route
+                    path="/chat/:id"
+                    element={<Chat />}
+                />
 
-
-        <Route 
-          path="/register" 
-          element={<Register />} 
-        />
-
-
-        <Route 
-          path="/dashboard" 
-          element={<Dashboard />} 
-        />
-
-
-        <Route 
-          path="/profile" 
-          element={<Profile />} 
-        />
-
-
-        <Route 
-          path="/alumni" 
-          element={<Alumni />} 
-        />
-
-
-        <Route 
-          path="/alumni/:id" 
-          element={<AlumniProfile />} 
-        />
-
-
-        <Route 
-          path="/chat/:id" 
-          element={<Chat />} 
-        />
-
-
-      </Routes>
-
-
-    </BrowserRouter>
-
-  );
-
+            </Routes>
+        </BrowserRouter>
+    );
 }
-
 
 export default App;
