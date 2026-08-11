@@ -1,38 +1,99 @@
-$CURSOR$
-# Environment
+```gitignore
+# =========================
+# Environment & Secrets
+# =========================
+
 .env
 .env.local
 .env.*.local
+!.env.example
 
-# Node modules
+
+# =========================
+# Dependencies
+# =========================
+
 node_modules/
 
-# Logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
 
-# Build output
+# =========================
+# Build Output
+# =========================
+
 dist/
 build/
 .next/
 .nuxt/
 
-# Testing
+
+# =========================
+# Logs
+# =========================
+
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+
+# =========================
+# Coverage / Testing
+# =========================
+
 coverage/
 *.lcov
 
-# System
+
+# =========================
+# Operating System
+# =========================
+
 .DS_Store
 Thumbs.db
 
-# IDEs
-.idea/
-.vscode/
 
-# Misc
+# =========================
+# IDE / Editor
+# =========================
+
+.vscode/
+.idea/
+
+
+# =========================
+# Cache
+# =========================
+
 .cache/
 .parcel-cache/
-*.sqlite
+.vite/
 
+
+# =========================
+# Local Databases
+# =========================
+
+*.sqlite
+*.sqlite3
+*.db
+
+
+# =========================
+# Temporary Files
+# =========================
+
+*.tmp
+*.temp
+*.swp
+*.swo
+
+
+# =========================
+# Uploads / Generated Files
+# =========================
+
+uploads/
+tmp/
+temp/
+```
