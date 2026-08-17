@@ -15,6 +15,11 @@ function Messages() {
     const [profiles, setProfiles] = useState([]);
     const [loading, setLoading] = useState(true);
 
+
+    // ==========================================
+    // LOAD DATA
+    // ==========================================
+
     useEffect(() => {
 
         if (user?._id) {
@@ -22,6 +27,7 @@ function Messages() {
         }
 
     }, []);
+
 
     async function loadData() {
 
@@ -35,17 +41,20 @@ function Messages() {
             const profileResponse =
                 await API.get("/profile");
 
+
             setMessages(
                 Array.isArray(messageResponse.data)
                     ? messageResponse.data
                     : []
             );
 
+
             setProfiles(
                 Array.isArray(profileResponse.data)
                     ? profileResponse.data
                     : []
             );
+
 
         } catch (error) {
 
@@ -63,6 +72,10 @@ function Messages() {
     }
 
 
+    // ==========================================
+    // FIND PROFILE
+    // ==========================================
+
     function getProfile(userId) {
 
         return profiles.find(
@@ -74,13 +87,12 @@ function Messages() {
     }
 
 
-    /*
-    ==========================================
-    CREATE ONE CONVERSATION PER USER
-    ==========================================
-    */
+    // ==========================================
+    // CREATE CONVERSATIONS
+    // ==========================================
 
     const conversations = [];
+
 
     messages.forEach((message) => {
 
@@ -91,36 +103,51 @@ function Messages() {
                 : message.senderId;
 
 
-        const existing =
+        let conversation =
             conversations.find(
-                (conversation) =>
-                    String(
-                        conversation.userId
-                    ) ===
+                (item) =>
+                    String(item.userId) ===
                     String(otherUser)
             );
 
 
-        if (!existing) {
+        if (!conversation) {
 
-            conversations.push({
+            conversation = {
 
                 userId: otherUser,
 
-                message: message
+                message: message,
 
-            });
+                unreadCount: 0
+
+            };
+
+
+            conversations.push(
+                conversation
+            );
+
+        }
+
+
+        // Count unread messages
+        if (
+            String(message.receiverId) ===
+                String(user._id) &&
+            message.read === false
+        ) {
+
+            conversation.unreadCount += 1;
 
         }
 
     });
 
 
-    /*
-    ==========================================
-    SORT LATEST FIRST
-    ==========================================
-    */
+    // ==========================================
+    // SORT CONVERSATIONS
+    // ==========================================
 
     conversations.sort(
         (a, b) =>
@@ -133,11 +160,9 @@ function Messages() {
     );
 
 
-    /*
-    ==========================================
-    LOADING
-    ==========================================
-    */
+    // ==========================================
+    // LOADING
+    // ==========================================
 
     if (loading) {
 
@@ -164,11 +189,9 @@ function Messages() {
     }
 
 
-    /*
-    ==========================================
-    PAGE
-    ==========================================
-    */
+    // ==========================================
+    // PAGE
+    // ==========================================
 
     return (
 
@@ -177,6 +200,8 @@ function Messages() {
             <Navbar />
 
             <div className="page-content">
+
+                {/* HEADER */}
 
                 <div className="page-header">
 
@@ -199,6 +224,8 @@ function Messages() {
 
                 </div>
 
+
+                {/* EMPTY STATE */}
 
                 {conversations.length === 0 ? (
 
@@ -226,6 +253,11 @@ function Messages() {
 
                 ) : (
 
+
+                    /* ==========================
+                       CONVERSATION LIST
+                    ========================== */
+
                     <div className="messages-list">
 
                         {conversations.map(
@@ -238,6 +270,7 @@ function Messages() {
 
                                 const message =
                                     conversation.message;
+
 
                                 const isMine =
                                     String(
@@ -263,7 +296,9 @@ function Messages() {
                                         }
                                     >
 
-                                        {/* PROFILE IMAGE */}
+                                        {/* ==================
+                                           AVATAR
+                                        ================== */}
 
                                         {profile?.profileImage ? (
 
@@ -290,20 +325,38 @@ function Messages() {
                                         )}
 
 
-                                        {/* MESSAGE DETAILS */}
+                                        {/* ==================
+                                           CONTENT
+                                        ================== */}
 
                                         <div className="conversation-content">
 
+
+                                            {/* TOP ROW */}
+
                                             <div className="conversation-top">
 
-                                                <h3>
+                                                <div>
 
-                                                    {profile?.name ||
-                                                        "Alumni"}
+                                                    <h3>
 
-                                                </h3>
+                                                        {profile?.name ||
+                                                            "Alumni"}
 
-                                                <span>
+                                                    </h3>
+
+                                                    <span className="conversation-role">
+
+                                                        {profile?.position ||
+                                                            profile?.company ||
+                                                            "Alumni"}
+
+                                                    </span>
+
+                                                </div>
+
+
+                                                <span className="conversation-time">
 
                                                     {new Date(
                                                         message.createdAt
@@ -322,15 +375,37 @@ function Messages() {
                                             </div>
 
 
-                                            <p>
+                                            {/* MESSAGE */}
 
-                                                {isMine
-                                                    ? "You: "
-                                                    : ""}
+                                            <div className="conversation-bottom">
 
-                                                {message.text}
+                                                <p>
 
-                                            </p>
+                                                    {isMine
+                                                        ? "You: "
+                                                        : ""}
+
+                                                    {message.text}
+
+                                                </p>
+
+
+                                                {/* UNREAD */}
+
+                                                {conversation.unreadCount >
+                                                    0 && (
+
+                                                    <span className="conversation-unread">
+
+                                                        {
+                                                            conversation.unreadCount
+                                                        }
+
+                                                    </span>
+
+                                                )}
+
+                                            </div>
 
                                         </div>
 
