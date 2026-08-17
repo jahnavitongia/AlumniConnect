@@ -7,10 +7,15 @@ import Profile from "./pages/Profile";
 import Alumni from "./pages/Alumni";
 import AlumniProfile from "./pages/AlumniProfile";
 import Chat from "./pages/Chat";
+import Messages from "./pages/Messages";
+
 
 function App() {
+
     return (
+
         <BrowserRouter>
+
             <Routes>
 
                 <Route
@@ -53,9 +58,17 @@ function App() {
                     element={<Chat />}
                 />
 
+                <Route
+                    path="/messages"
+                    element={<Messages />}
+                />
+
             </Routes>
+
         </BrowserRouter>
+
     );
+
 }
 
 export default App;
