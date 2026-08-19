@@ -184,6 +184,15 @@ function Navbar() {
                     Alumni
                 </NavLink>
 
+                <NavLink
+    to="/opportunities"
+    className={({ isActive }) =>
+        `nav-link ${isActive ? "active" : ""}`
+    }
+>
+    Opportunities
+</NavLink>
+
 
                 {/* ==================================
                     MESSAGES

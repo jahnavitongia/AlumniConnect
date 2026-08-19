@@ -45,10 +45,17 @@ app.use(express.json());
 const authRoutes = require("./routes/authRoutes");
 const profileRoutes = require("./routes/profile");
 const messageRoutes = require("./routes/message");
+const opportunityRoutes = require("./routes/opportunityRoutes");
+
+
+// ===============================
+// API ROUTES
+// ===============================
 
 app.use("/api/auth", authRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/message", messageRoutes);
+app.use("/api/opportunities", opportunityRoutes);
 
 
 // ===============================

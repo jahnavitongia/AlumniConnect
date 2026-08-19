@@ -8,6 +8,7 @@ import Alumni from "./pages/Alumni";
 import AlumniProfile from "./pages/AlumniProfile";
 import Chat from "./pages/Chat";
 import Messages from "./pages/Messages";
+import Opportunities from "./pages/Opportunities";
 
 
 function App() {
@@ -47,6 +48,21 @@ function App() {
                     path="/alumni"
                     element={<Alumni />}
                 />
+
+                <Route
+    path="/alumni"
+    element={<Alumni />}
+/>
+
+<Route
+    path="/opportunities"
+    element={<Opportunities />}
+/>
+
+<Route
+    path="/alumni/:id"
+    element={<AlumniProfile />}
+/>
 
                 <Route
                     path="/alumni/:id"
